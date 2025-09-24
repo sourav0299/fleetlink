@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import MapLocationPicker from "@/components/MapLocationPicker";
 import { googleMapsService, MapLocation } from "@/lib/google-maps";
@@ -71,11 +71,6 @@ export default function BookingPage() {
     useState<BookingFormData>(INITIAL_BOOKING_DATA);
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [isCalculatingTrip, setIsCalculatingTrip] = useState(false);
-  const [tripEstimation, setTripEstimation] = useState<{
-    distance: number;
-    duration: string;
-  } | null>(null);
 
   const packageTypes = [
     { value: "documents", label: "Documents", icon: "📄" },
@@ -156,57 +151,6 @@ export default function BookingPage() {
     return isNaN(bookingData.package.weight) ? 0 : bookingData.package.weight;
   };
 
-  const calculateTripEstimation = useCallback(async () => {
-    if (!bookingData.pickup.mapLocation || !bookingData.drop.mapLocation) {
-      return;
-    }
-
-    setIsCalculatingTrip(true);
-    try {
-      let distance = 0;
-      let duration = "";
-
-      const result = await googleMapsService.calculateDistanceAndDuration(
-        bookingData.pickup.mapLocation,
-        bookingData.drop.mapLocation
-      );
-
-      if (result) {
-        distance = Math.round(result.distance.value / 1000);
-        const hours = Math.floor(result.duration.value / 3600);
-        const minutes = Math.ceil((result.duration.value % 3600) / 60);
-        duration = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-      } else {
-        distance = Math.floor(Math.random() * 50) + 5;
-        duration = `${Math.ceil((distance / 25) * 60)}m`;
-      }
-
-      setTripEstimation({ distance, duration });
-    } catch (error) {
-      console.error("Error calculating trip estimation:", error);
-      toast.error("Error calculating trip estimation");
-      const distance = Math.floor(Math.random() * 50) + 5;
-      const duration = `${Math.ceil((distance / 25) * 60)}m`;
-      setTripEstimation({ distance, duration });
-    } finally {
-      setIsCalculatingTrip(false);
-    }
-  }, [bookingData.pickup.mapLocation, bookingData.drop.mapLocation]);
-
-  useEffect(() => {
-    if (
-      bookingData.pickup.mapLocation &&
-      bookingData.drop.mapLocation &&
-      !isCalculatingTrip
-    ) {
-      calculateTripEstimation();
-    }
-  }, [
-    bookingData.pickup.mapLocation,
-    bookingData.drop.mapLocation,
-    calculateTripEstimation,
-    isCalculatingTrip,
-  ]);
 
   const calculateEstimation = async () => {
     setIsLoading(true);

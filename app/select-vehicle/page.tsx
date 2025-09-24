@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useRazorpay } from '../../hooks/useRazorpay';
@@ -47,7 +47,7 @@ interface BookingData {
   };
 }
 
-export default function VehicleSelectionPage() {
+function VehicleSelectionPageContent() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -548,5 +548,26 @@ Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
         {selectedVehicle && <div className="h-24"></div>}
       </div>
     </div>
+  );
+}
+
+// Loading component for Suspense fallback
+function VehicleSelectionLoading() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading vehicle selection...</p>
+      </div>
+    </div>
+  );
+}
+
+// Main export with Suspense wrapper
+export default function VehicleSelectionPage() {
+  return (
+    <Suspense fallback={<VehicleSelectionLoading />}>
+      <VehicleSelectionPageContent />
+    </Suspense>
   );
 }

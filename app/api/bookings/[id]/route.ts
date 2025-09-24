@@ -4,10 +4,10 @@ import { ObjectId } from 'mongodb';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const bookingId = params.id;
+    const bookingId = (await params).id;
 
     if (!bookingId || !ObjectId.isValid(bookingId)) {
       return NextResponse.json(
@@ -72,10 +72,10 @@ export async function DELETE(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const bookingId = params.id;
+    const bookingId = (await params).id;
 
     if (!bookingId || !ObjectId.isValid(bookingId)) {
       return NextResponse.json(
@@ -118,10 +118,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const bookingId = params.id;
+    const bookingId =  (await params).id;
     const updateData = await request.json();
 
     if (!bookingId || !ObjectId.isValid(bookingId)) {

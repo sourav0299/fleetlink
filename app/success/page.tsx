@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -21,7 +21,7 @@ interface SuccessData {
   distance?: number;
 }
 
-export default function SuccessPage() {
+function SuccessPageContent() {
   const [countdown, setCountdown] = useState(5);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -321,5 +321,26 @@ export default function SuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Loading component for Suspense fallback
+function SuccessPageLoading() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading success page...</p>
+      </div>
+    </div>
+  );
+}
+
+// Main export with Suspense wrapper
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<SuccessPageLoading />}>
+      <SuccessPageContent />
+    </Suspense>
   );
 }

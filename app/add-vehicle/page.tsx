@@ -259,7 +259,7 @@ export default function OnboardingPage() {
       
       document.head.appendChild(script);
     });
-  }, []);
+  }, [initializeAutocomplete]);
 
   const createRazorpayOrder = async () => {
     try {
